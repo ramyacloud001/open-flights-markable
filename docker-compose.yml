@@ -1,0 +1,51 @@
+version: "3"
+services:
+  rails-app:
+    build: .
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+      - cache
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: rails_app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: rails_db
+
+  cache:
+    image: redis:6
+
+  elk:
+    image: sebp/elk
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+    volumes:
+      - ./logstash:/etc/logstash
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    environment:
+      LS_HEAP_SIZE: "1g"
+    depends_on:
+      - rails-app
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    depends_on:
+      - rails-app
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
