@@ -11,7 +11,7 @@ COPY package.json yarn.lock ./
 RUN yarn install
 
 # Now build the Rails application using the official Ruby image
-FROM ruby:3.2.2
+FROM ruby:2.7
 
 # Set environment variables
 ENV RAILS_ENV=production \
