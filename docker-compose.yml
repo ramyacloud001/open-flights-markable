@@ -14,3 +14,5 @@ services:
       POSTGRES_USER: rails_app
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: rails_db
+  cache:
+    image: redis:6
